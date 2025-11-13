@@ -7,7 +7,7 @@ from sahi import AutoDetectionModel
 from sahi.predict import get_sliced_prediction
 
 from ultralytics.utils.files import increment_path
-
+from collections import Counter # Import Counter for class-specific statistics
 
 class SAHIInference:
     """Runs Ultralytics YOLO11 and SAHI for object detection on video with options to view, save, and track results.
@@ -150,6 +150,18 @@ class SAHIInference:
                 slice_height=slice_height,
                 slice_width=slice_width,
             )
+
+            # ✅ COUNTING THE DETECTED OBJECTS AND GETTING STATISTICS
+            detected_count = len(results.object_prediction_list)
+            
+            # Get class-specific counts
+            class_names = [p.category.name for p in results.object_prediction_list]
+            class_counts = Counter(class_names)
+            
+            print(f"--- Frame {idx + 1} ({detected_count} TOTAL Detections) ---")
+            print(f"Class Statistics: {class_counts}")
+            
+            # ------------------------------------------------------------------
 
             # --- CUSTOM VISUALIZATION: Draw boxes directly using OpenCV ---
             annotated_frame = self.draw_bboxes(
